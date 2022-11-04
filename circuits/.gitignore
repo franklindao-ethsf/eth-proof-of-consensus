@@ -1,3 +1,4 @@
 build/
 *.ptau
 *.log
+node_modules/
