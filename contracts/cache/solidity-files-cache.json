@@ -1118,8 +1118,8 @@
       }
     },
     "src/amb/TrustlessAMB.sol": {
-      "lastModificationDate": 1667603419782,
-      "contentHash": "068cffac5d2a873068cb087b78d3a734",
+      "lastModificationDate": 1667670191590,
+      "contentHash": "d69437e2291ac7a2612a40427cb1423d",
       "sourceName": "src/amb/TrustlessAMB.sol",
       "solcConfig": {
         "settings": {

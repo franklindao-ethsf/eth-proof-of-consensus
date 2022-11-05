@@ -1,34 +1,49 @@
-import { ethers, Wallet } from "ethers"; 
-import axios from "axios"; 
-// import ABI
-import TokenBridgeABI from "../artifacts/contracts/WormholeTokenBridge/TokenBridge.sol/TokenBridge.json" assert {type: 'json'}
+import { ethers } from "ethers";
+// import dotenv from "dotenv";
+// dotenv.config();
 
-// Provider and Signer
-const mnemonic = ""; 
-const walletMnemonic = Wallet.fromMnemonic(mnemonic); 
-const provider = new ethers.providers.JsonRpcProvider('');
-const signer = walletMnemonic.connect(provider);
+const provider = new ethers.providers.JsonRpcProvider(
+    "https://rpc.ankr.com/eth_goerli",
+);
+console.log(process.env.GOERLI_PRIVATE_KEY);
 
+const wallet = new ethers.Wallet(process.env.GOERLI_PRIVATE_KEY, provider);
+const deposit_addr = "0x8EDeAdEd3D9b45F30e725fe069bD9FFDb9571bDD";
+const caller_pubkey = "0x86283791B4e9BF64AA71b921A302559b48911c61";
+const gsb_addr = "0x45cD94330AC3aeA42cc21Cf9315B745e27e768BD";
 // Instantiate Contract
-const contractAddress = ""; 
-const contractABI = ""; 
+// deposittoken = pkey
+const deposit_contractABI = ["function deposit(address recipient, uint256 amount, address tokenAddress)"];
+const gsb_contractABI = ["function approve(address spender,uint256 amount)"]
 
-const contract = new ethers.Contract(contractAddress, contractABI, signer);
-contract.connect(signer); 
+const deposit_contract = new ethers.Contract(deposit_addr, deposit_contractABI, wallet);
+deposit_contract.connect(wallet);
 
-console.log(recipient)
+const approve_contract = new ethers.Contract(gsb_addr, gsb_contractABI, wallet);
+approve_contract.connect(wallet);
 
 async function main() {
-    const tx = await contract.transferTokens(
+    // const approve_tx = await approve_contract.approve(
+    //     deposit_addr,
+    //     69
+    // )
+    // console.log(approve_tx);
+    // console.log(await approve_tx.wait())
+    // console.log("approve done");
+
+    const tx = await deposit_contract.deposit(
+        caller_pubkey,
+        1,
+        gsb_addr,
         // inputs 
-        nonce,
         {
-            value: amount,
-            gasLimit: 1000000,
+            value: 0,
+            // gasLimit: 100000,
         }
     )
-    console.log(tx); 
+    console.log(tx);
     console.log(await tx.wait())
+    console.log("deposit done");
 }
 
 main().catch((err) => {
