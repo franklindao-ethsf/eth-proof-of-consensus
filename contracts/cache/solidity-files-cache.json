@@ -1118,8 +1118,8 @@
       }
     },
     "src/amb/TrustlessAMB.sol": {
-      "lastModificationDate": 1667670191590,
-      "contentHash": "d69437e2291ac7a2612a40427cb1423d",
+      "lastModificationDate": 1667602796644,
+      "contentHash": "068cffac5d2a873068cb087b78d3a734",
       "sourceName": "src/amb/TrustlessAMB.sol",
       "solcConfig": {
         "settings": {
@@ -1422,7 +1422,7 @@
       }
     },
     "src/amb/test/TrustlessAMB.t.sol": {
-      "lastModificationDate": 1667603419783,
+      "lastModificationDate": 1667602796644,
       "contentHash": "47e0b8e601cc110c1f09ac8dd8c3c9dc",
       "sourceName": "src/amb/test/TrustlessAMB.t.sol",
       "solcConfig": {
@@ -1494,8 +1494,8 @@
       }
     },
     "src/bridge/Bridge.sol": {
-      "lastModificationDate": 1667603419783,
-      "contentHash": "99c8e7c3d8317c5b3f4fe61e5691624b",
+      "lastModificationDate": 1667674716462,
+      "contentHash": "b85373f86bf0519717642d95c69ed134",
       "sourceName": "src/bridge/Bridge.sol",
       "solcConfig": {
         "settings": {
@@ -1620,7 +1620,7 @@
       }
     },
     "src/bridge/test/Bridge.t.sol": {
-      "lastModificationDate": 1667603419783,
+      "lastModificationDate": 1667602796645,
       "contentHash": "62e50097ebae6fdece339177aefa5e6a",
       "sourceName": "src/bridge/test/Bridge.t.sol",
       "solcConfig": {
@@ -2292,7 +2292,7 @@
       }
     },
     "src/scripts/MockDeposit.s.sol": {
-      "lastModificationDate": 1667603419785,
+      "lastModificationDate": 1667602796646,
       "contentHash": "8c99155a2ba207bebd2e82078e915f6b",
       "sourceName": "src/scripts/MockDeposit.s.sol",
       "solcConfig": {
