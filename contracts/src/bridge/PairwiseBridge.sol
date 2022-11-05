@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.14;
 
@@ -7,16 +8,33 @@ import "forge-std/console.sol";
 import "../amb/interfaces/ITrustlessAMB.sol";
 import "./Tokens.sol";
 
-contract Bridge is Ownable {
+contract PairwiseBridge is Ownable {
+
+    struct TokenInfo {
+        uint16 sourceChain; 
+        // chain to tokens 
+        mapping (uint16 => address) tokenAddresses; 
+    }
+
+    mapping (address => TokenInfo) public tokenRegistry; 
+
+    function addToken(uint16 sourceChain, address tokenAddress, uint16[] calldata chainIds, address[] calldata addresses) public onlyOwner {
+        require(chainIds.length == addresses.length, "Length of two arrays must be the same"); 
+
+        for (uint i=0; i < chainIds.length; i++) {
+            tokenRegistry[tokenAddress].sourceChain = sourceChain; 
+            tokenRegistry[tokenAddress].tokenAddresses[chainIds[i]] = addresses[i];  
+        }
+    }
+
 	mapping(address => address) public tokenAddressConverter;
-	
 
 	function setMapping(address addr1, address addr2) public onlyOwner {
 		tokenAddressConverter[addr1] = addr2;
 	}
 }
 
-contract Deposit is Bridge {
+contract Deposit is PairwiseBridge {
     ITrustlessAMB homeAmb;
     address foreignWithdraw;
 	uint16 chainId;
@@ -46,7 +64,20 @@ contract Deposit is Bridge {
 		require(tokenAddressConverter[tokenAddress] != address(0), "Invalid token address");
         require(amount <= 100, "Can deposit a max of 100 tokens at a time");
 		require(IERC20(tokenAddress).balanceOf(msg.sender) >= amount, "Insufficient balance");
-		IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);
+		
+        // check if the token is bridged or not 
+        // check source chain of token 
+     
+        // if mapping doesn't exist, defaults to 0
+        if (tokenRegistry[tokenAddress] != 0) {
+            IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);     
+        } else {
+            // non native token 
+            // mint if bridging, unlock if redeeming (if sourcechain == chainId)
+            
+            IERC20(tokenAddress).transferFrom(msg.sender, address(0), amount); 
+        }
+        
         bytes memory msgData = abi.encode(recipient, amount, tokenAddress);
         homeAmb.send(foreignWithdraw, chainId, GAS_LIMIT, msgData);
 		emit DepositEvent(msg.sender, recipient, amount, tokenAddress);
@@ -72,7 +103,7 @@ contract DepositMock is Deposit {
 	}
 }
 
-contract Withdraw is Bridge {
+contract Withdraw is PairwiseBridge {
     address homeDeposit;
     address foreignAmb;
     IERC20Ownable public token;
@@ -100,6 +131,9 @@ contract Withdraw is Bridge {
 	) public {
         require(msg.sender == foreignAmb, "Only foreign amb can call this function");
         require(srcAddress == homeDeposit, "Only home deposit can trigger a message call to this contract.");
+
+
+
         (address recipient, uint256 amount, address tokenAddress) = abi.decode(callData, (address, uint256, address));
 		address newTokenAddress = tokenAddressConverter[tokenAddress];
 		require(newTokenAddress != address(0), "Invalid token address");
