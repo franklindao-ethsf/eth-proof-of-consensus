@@ -6,6 +6,7 @@ import "openzeppelin-contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/access/Ownable.sol";
 import "forge-std/console.sol";
 import "../amb/interfaces/ITrustlessAMB.sol";
+import "./
 import "./Tokens.sol";
 
 contract PairwiseBridge is Ownable {
@@ -47,7 +48,8 @@ contract Deposit is PairwiseBridge {
 		address indexed from,
 		address indexed recipient,
 		uint256 amount,
-		address tokenAddress
+		address tokenAddress,
+        uint16 destinationChainId
 	);
 
 	constructor(ITrustlessAMB _homeAmb, address _foreignWithdraw, uint16 _chainId) {
@@ -59,54 +61,52 @@ contract Deposit is PairwiseBridge {
 	function deposit(
 		address recipient,
 		uint256 amount,
-		address tokenAddress
+		address tokenAddress,
+        uint16 destinationChainId // new destination chainId address 
 	) external virtual {
 		require(tokenAddressConverter[tokenAddress] != address(0), "Invalid token address");
         require(amount <= 100, "Can deposit a max of 100 tokens at a time");
 		require(IERC20(tokenAddress).balanceOf(msg.sender) >= amount, "Insufficient balance");
-		
-        // check if the token is bridged or not 
-        // check source chain of token 
      
-        // if mapping doesn't exist, defaults to 0
-        if (tokenRegistry[tokenAddress] != 0) {
+        // if mapping exists => native => lock 
+        if (tokenRegistry[tokenAddress].sourceChain != 0) {
             IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);     
         } else {
-            // non native token 
-            // mint if bridging, unlock if redeeming (if sourcechain == chainId)
-            
+            // if non native token => burn 
             IERC20(tokenAddress).transferFrom(msg.sender, address(0), amount); 
         }
         
-        bytes memory msgData = abi.encode(recipient, amount, tokenAddress);
+        bytes memory msgData = abi.encode(recipient, amount, tokenAddress, destinationChainId);
         homeAmb.send(foreignWithdraw, chainId, GAS_LIMIT, msgData);
-		emit DepositEvent(msg.sender, recipient, amount, tokenAddress);
+		emit DepositEvent(msg.sender, recipient, amount, tokenAddress, destinationChainId);
 	}
 }
 
-contract DepositMock is Deposit {
-	constructor(ITrustlessAMB _homeAmb, address _foreignWithdraw, uint16 _chainId) Deposit(_homeAmb, _foreignWithdraw, _chainId) {
-	}
+// contract DepositMock is Deposit {
+// 	constructor(ITrustlessAMB _homeAmb, address _foreignWithdraw, uint16 _chainId) Deposit(_homeAmb, _foreignWithdraw, _chainId) {
+// 	}
 
-	// We have a mock for testing purposes.
-	function deposit(
-		address recipient,
-		uint256 amount,
-		address tokenAddress
-	) external override {
-		require(tokenAddressConverter[tokenAddress] != address(0), "Invalid token address");
-        require(amount <= 100, "Can deposit a max of 100 tokens at a time");
-		// Do not do any of the checks involving ERC20.
-		bytes memory msgData = abi.encode(recipient, amount, tokenAddress);
-        homeAmb.send(foreignWithdraw, chainId, GAS_LIMIT, msgData);
-		emit DepositEvent(msg.sender, recipient, amount, tokenAddress);
-	}
-}
+// 	// We have a mock for testing purposes.
+// 	function deposit(
+// 		address recipient,
+// 		uint256 amount,
+// 		address tokenAddress
+// 	) external override {
+// 		require(tokenAddressConverter[tokenAddress] != address(0), "Invalid token address");
+//         require(amount <= 100, "Can deposit a max of 100 tokens at a time");
+// 		// Do not do any of the checks involving ERC20.
+// 		bytes memory msgData = abi.encode(recipient, amount, tokenAddress);
+//         homeAmb.send(foreignWithdraw, chainId, GAS_LIMIT, msgData);
+// 		emit DepositEvent(msg.sender, recipient, amount, tokenAddress);
+// 	}
+// }
 
 contract Withdraw is PairwiseBridge {
     address homeDeposit;
     address foreignAmb;
     IERC20Ownable public token;
+
+
 
 	event WithdrawEvent(
 		address indexed from,
@@ -132,12 +132,16 @@ contract Withdraw is PairwiseBridge {
         require(msg.sender == foreignAmb, "Only foreign amb can call this function");
         require(srcAddress == homeDeposit, "Only home deposit can trigger a message call to this contract.");
 
-
-
-        (address recipient, uint256 amount, address tokenAddress) = abi.decode(callData, (address, uint256, address));
+        (address recipient, uint256 amount, address tokenAddress, uint16 destinationChainId) = abi.decode(callData, (address, uint256, address, uint16));
 		address newTokenAddress = tokenAddressConverter[tokenAddress];
-		require(newTokenAddress != address(0), "Invalid token address");
-        token.transfer(recipient, amount);
+        require(newTokenAddress != address(0), "Invalid token address");
+
+        if (destinationChainId == tokenRegistry[tokenAddress].sourceChain) {
+            // unlock or transfer out of the deposit contract on this chain 
+        } else {
+            // mint new 
+            token.transfer(recipient, amount);
+        }
 		emit WithdrawEvent(msg.sender, recipient, amount, tokenAddress, newTokenAddress);
 	}
 }
