@@ -1,3 +1,13 @@
+# How to run the project
+update version using .nvmrc
+nvm use 
+nvm install 
+npm install 
+forge install foundry-rs/forge-std
+forge install openzeppelin openzeppelin-contracts
+
+
+
 # Proof of Consensus for Ethereum
 
 [![Twitter URL](https://img.shields.io/twitter/follow/succinctlabs?style=social)](https://twitter.com/succinctlabs)
