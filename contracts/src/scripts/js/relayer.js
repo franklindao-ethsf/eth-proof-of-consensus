@@ -5,13 +5,15 @@ import axios from "axios";
 import {ethers} from "ethers";
 
 const provider = new ethers.providers.JsonRpcProvider(
-    "https://rpc.ankr.com/gnosis",
+    "http://127.0.0.1:8545",
 );
 console.log(process.env.GNOSIS_PRIVATE_KEY);
 
 const wallet = new ethers.Wallet(process.env.GNOSIS_PRIVATE_KEY, provider);
 
-const gnosis_amb_addr = "0x11f4b338c6127f0939d3d7cd56b1c9e6c4a68725"
+const gnosis_amb_addr = "0x72558e5f0346Ee111a1E33F75585233242402Ed8"
+console.log("Gnosis AMB: ", gnosis_amb_addr);
+
 const gnosis_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
 const gnosis_amb_contract = new ethers.Contract(gnosis_amb_addr, gnosis_amb_contractABI, wallet);
 gnosis_amb_contract.connect(wallet);
@@ -35,7 +37,9 @@ const items = resp.data.data.items
 
 items.slice(items.length - 1).forEach(async item => {
     console.log("Processing transaction " + item.tx_hash)
-    const message = item.raw_log_data;
+    let message = item.raw_log_data;
+    message = "0x" + message.slice(130);
+    console.log(message);
     const block = item.block_height;
     const account = await alchemyProvider.send("eth_getProof", [
         '0x68787ab0ca5a4a8cc82177b4e4f206765ce39956', // amb address
@@ -52,8 +56,11 @@ items.slice(items.length - 1).forEach(async item => {
             gasLimit: 500000
         }
     )
-    console.log(gnosis_tx)
-    console.log(gnosis_tx.wait())
+    // console.log(gnosis_tx)
+    console.log("WAITED")
+    console.log(await gnosis_tx.wait())
     console.log("executeMessage done")
+
+    // console.log(await provider.getTransactionReceipt(gnosis_tx.hash))
 })
 

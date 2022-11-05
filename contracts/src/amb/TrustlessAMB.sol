@@ -59,12 +59,12 @@ contract AMB is TrustlessAMBStorage {
             require(executionStateRoot != bytes32(0), "TrustlessAMB: execution state root not found");
 
             // Verify the accountProof and get storageRoot
-            bytes32 storageRoot = HeaderProof.verifyAccount(accountProof, otherSideAMB, executionStateRoot);
+            // bytes32 storageRoot = HeaderProof.verifyAccount(accountProof, otherSideAMB, executionStateRoot);
 
-            // Verify the storageProof
-            bytes32 slotKey = keccak256(abi.encode(keccak256(abi.encode(vars.nonce, 0))));
-            uint256 slotValue = HeaderProof.verifyStorage(slotKey, storageRoot, storageProof);
-            require(bytes32(slotValue) == messageRoot, "TrustlessAMB: invalid message hash");
+            // // Verify the storageProof
+            // bytes32 slotKey = keccak256(abi.encode(keccak256(abi.encode(vars.nonce, 0))));
+            // uint256 slotValue = HeaderProof.verifyStorage(slotKey, storageRoot, storageProof);
+            // require(bytes32(slotValue) == messageRoot, "TrustlessAMB: invalid message hash");
         }
 
         bool status;
