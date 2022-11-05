@@ -6,25 +6,24 @@ import "openzeppelin-contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/access/Ownable.sol";
 import "forge-std/console.sol";
 import "../amb/interfaces/ITrustlessAMB.sol";
-import "./
 import "./Tokens.sol";
 
 contract PairwiseBridge is Ownable {
 
     struct TokenInfo {
-        uint16 sourceChain; 
+        uint16 sourceChainId;  
         // chain to tokens 
         mapping (uint16 => address) tokenAddresses; 
     }
 
-    mapping (address => TokenInfo) public tokenRegistry; 
+    mapping (uint8 => TokenInfo) public tokenRegistry; 
 
-    function addToken(uint16 sourceChain, address tokenAddress, uint16[] calldata chainIds, address[] calldata addresses) public onlyOwner {
+    function addToken(uint8 tokenId, uint16 sourceChain, uint16[] calldata chainIds, address[] calldata addresses) public onlyOwner {
         require(chainIds.length == addresses.length, "Length of two arrays must be the same"); 
 
         for (uint i=0; i < chainIds.length; i++) {
-            tokenRegistry[tokenAddress].sourceChain = sourceChain; 
-            tokenRegistry[tokenAddress].tokenAddresses[chainIds[i]] = addresses[i];  
+            tokenRegistry[tokenId].sourceChainId = sourceChain; 
+            tokenRegistry[tokenId].tokenAddresses[chainIds[i]] = addresses[i];  
         }
     }
 
@@ -45,11 +44,13 @@ contract Deposit is PairwiseBridge {
     uint256 internal constant GAS_LIMIT = 50000;
 
 	event DepositEvent(
+        uint8 indexed tokenId, 
 		address indexed from,
 		address indexed recipient,
 		uint256 amount,
 		address tokenAddress,
-        uint16 destinationChainId
+        uint16 destinationChainId,
+        address destinationToken
 	);
 
 	constructor(ITrustlessAMB _homeAmb, address _foreignWithdraw, uint16 _chainId) {
@@ -59,6 +60,7 @@ contract Deposit is PairwiseBridge {
 	}
 
 	function deposit(
+        uint8 tokenId, 
 		address recipient,
 		uint256 amount,
 		address tokenAddress,
@@ -67,18 +69,21 @@ contract Deposit is PairwiseBridge {
 		require(tokenAddressConverter[tokenAddress] != address(0), "Invalid token address");
         require(amount <= 100, "Can deposit a max of 100 tokens at a time");
 		require(IERC20(tokenAddress).balanceOf(msg.sender) >= amount, "Insufficient balance");
-     
+    
         // if mapping exists => native => lock 
-        if (tokenRegistry[tokenAddress].sourceChain != 0) {
+        if (tokenRegistry[tokenId].sourceChainId != chainId) {
             IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);     
         } else {
             // if non native token => burn 
             IERC20(tokenAddress).transferFrom(msg.sender, address(0), amount); 
         }
-        
-        bytes memory msgData = abi.encode(recipient, amount, tokenAddress, destinationChainId);
+
+        address destinationToken = tokenRegistry[tokenId].tokenAddresses[destinationChainId]; 
+
+
+        bytes memory msgData = abi.encode(tokenId, recipient, amount, tokenAddress, destinationChainId, destinationToken);
         homeAmb.send(foreignWithdraw, chainId, GAS_LIMIT, msgData);
-		emit DepositEvent(msg.sender, recipient, amount, tokenAddress, destinationChainId);
+		emit DepositEvent(tokenId, msg.sender, recipient, amount, tokenAddress, destinationChainId, destinationToken);
 	}
 }
 
@@ -106,7 +111,7 @@ contract Withdraw is PairwiseBridge {
     address foreignAmb;
     IERC20Ownable public token;
 
-
+    address sameChainDeposit; 
 
 	event WithdrawEvent(
 		address indexed from,
@@ -116,9 +121,10 @@ contract Withdraw is PairwiseBridge {
 		address newTokenAddress
 	);
 
-	constructor(address _foreignAmb, address _homeDeposit) {
+	constructor(address _foreignAmb, address _homeDeposit, address _sameChainDeposit) {
 		foreignAmb = _foreignAmb;
 		homeDeposit = _homeDeposit;
+        sameChainDeposit = _sameChainDeposit; 
         token = new SuccinctToken();
         uint256 MAX_INT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
         // Mint the max number of tokens to this contract
@@ -132,15 +138,17 @@ contract Withdraw is PairwiseBridge {
         require(msg.sender == foreignAmb, "Only foreign amb can call this function");
         require(srcAddress == homeDeposit, "Only home deposit can trigger a message call to this contract.");
 
-        (address recipient, uint256 amount, address tokenAddress, uint16 destinationChainId) = abi.decode(callData, (address, uint256, address, uint16));
-		address newTokenAddress = tokenAddressConverter[tokenAddress];
+        (uint8 tokenId, address recipient, uint256 amount, address tokenAddress, uint16 destinationChainId, address destinationToken) = abi.decode(callData, (uint8, address, uint256, address, uint16, address));
+
+        address newTokenAddress = tokenAddressConverter[tokenAddress];
         require(newTokenAddress != address(0), "Invalid token address");
 
-        if (destinationChainId == tokenRegistry[tokenAddress].sourceChain) {
+        if (destinationChainId == tokenRegistry[tokenId].sourceChainId) {
             // unlock or transfer out of the deposit contract on this chain 
+            IERC20(destinationToken).transferFrom(sameChainDeposit, recipient, amount); 
         } else {
             // mint new 
-            token.transfer(recipient, amount);
+            IERC20(destinationToken).transfer(recipient, amount);
         }
 		emit WithdrawEvent(msg.sender, recipient, amount, tokenAddress, newTokenAddress);
 	}
