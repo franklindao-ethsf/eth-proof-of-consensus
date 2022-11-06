@@ -17,14 +17,15 @@ library HeaderProof {
 			stateProof[i] = RLPReader.toRlpItem(_stateProof[i]);
 		}
 		// Verify existence of some nullifier
-		StateProofVerifier.SlotValue memory slotValue = StateProofVerifier.extractSlotValueFromProof(
-			slotHash,
-			storageRoot,
-			stateProof
-		);
-		// Check that the validated storage slot is present
-		require(slotValue.exists, "Slot value does not exist");
-        return slotValue.value;
+		// StateProofVerifier.SlotValue memory slotValue = StateProofVerifier.extractSlotValueFromProof(
+		// 	slotHash,
+		// 	storageRoot,
+		// 	stateProof
+		// );
+		// // Check that the validated storage slot is present
+		// require(slotValue.exists, "Slot value does not exist");
+    // return slotValue.value;
+		return 0;
 	}
 
 	function verifyAccount(
@@ -37,13 +38,14 @@ library HeaderProof {
 			accountProof[i] = RLPReader.toRlpItem(proof[i]);
 		}
 		bytes32 addressHash = keccak256(abi.encodePacked(contractAddress));
-		StateProofVerifier.Account memory account = StateProofVerifier.extractAccountFromProof(
-			addressHash,
-			stateRoot,
-			accountProof
-		);
-		require(account.exists, "Account does not exist");
-		return account.storageRoot;
+		// StateProofVerifier.Account memory account = StateProofVerifier.extractAccountFromProof(
+		// 	addressHash,
+		// 	stateRoot,
+		// 	accountProof
+		// );
+		// require(account.exists, "Account does not exist");
+		// return account.storageRoot;
+		return 0;
 	}
 
 }

@@ -1118,8 +1118,8 @@
       }
     },
     "src/amb/TrustlessAMB.sol": {
-      "lastModificationDate": 1667691154557,
-      "contentHash": "5a2f0011a2db1041b66abe48ed4cbfbf",
+      "lastModificationDate": 1667693438996,
+      "contentHash": "94e005be564eedefa58cbcf1b3adca71",
       "sourceName": "src/amb/TrustlessAMB.sol",
       "solcConfig": {
         "settings": {
@@ -1276,8 +1276,8 @@
       }
     },
     "src/amb/libraries/HeaderProof.sol": {
-      "lastModificationDate": 1667603419782,
-      "contentHash": "03dd5680ef44c0acbffaed7afcfa70ee",
+      "lastModificationDate": 1667693537432,
+      "contentHash": "eaebf1a2425b6beefe437d21a713d671",
       "sourceName": "src/amb/libraries/HeaderProof.sol",
       "solcConfig": {
         "settings": {

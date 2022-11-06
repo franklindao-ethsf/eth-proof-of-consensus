@@ -11,7 +11,7 @@ console.log(process.env.GNOSIS_PRIVATE_KEY);
 
 const wallet = new ethers.Wallet(process.env.GNOSIS_PRIVATE_KEY, provider);
 
-const gnosis_amb_addr = "0x72558e5f0346Ee111a1E33F75585233242402Ed8"
+const gnosis_amb_addr = "0x9ded50b05301D8E371a3014f3Ddb5bfbc9454C43"
 console.log("Gnosis AMB: ", gnosis_amb_addr);
 
 const gnosis_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
