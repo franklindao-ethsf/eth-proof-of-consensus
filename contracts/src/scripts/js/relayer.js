@@ -5,13 +5,13 @@ import axios from "axios";
 import {ethers} from "ethers";
 
 const provider = new ethers.providers.JsonRpcProvider(
-    "http://127.0.0.1:8545",
+    process.env.GNOSIS_RPC_URL,
 );
 console.log(process.env.GNOSIS_PRIVATE_KEY);
 
 const wallet = new ethers.Wallet(process.env.GNOSIS_PRIVATE_KEY, provider);
 
-const gnosis_amb_addr = "0x9ded50b05301D8E371a3014f3Ddb5bfbc9454C43"
+const gnosis_amb_addr = "0x4812651E7f7E1A18225e5EC003f9E032318B7adF"
 console.log("Gnosis AMB: ", gnosis_amb_addr);
 
 const gnosis_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
@@ -22,25 +22,19 @@ const apiKey = "-pZDSyH8gXs_PdlVenq0wJz_m7YaZfTp";
 
 const alchemyProvider = new ethers.providers.AlchemyProvider("goerli", apiKey);
 
-const goerli_amb_contract = "0x68787ab0ca5a4a8cc82177b4e4f206765ce39956"
+const goerli_amb_contract = "0xb45096DB3B299fBcd37AD6F3B47AC3F3a8a1feD8"
 
-const covalentURL = "https://api.covalenthq.com/v1/5/events/address/" + goerli_amb_contract + "/?quote-currency=USD&format=JSON&starting-block=7898242&ending-block=latest&key=ckey_f6a51a0e21004ad29ebabc70660"
+let lastBlock = 7901325;
 
-const resp = await axios.get(covalentURL, {
-    auth: {
-        username: "ckey_f6a51a0e21004ad29ebabc70660",
-        password: ""
-    }
-})
-
-const items = resp.data.data.items
-
-items.slice(items.length - 1).forEach(async item => {
+const emit = async item => {
     console.log("Processing transaction " + item.tx_hash)
     let message = item.raw_log_data;
     message = "0x" + message.slice(130);
     console.log(message);
     const block = item.block_height;
+    if (block > lastBlock) {
+        lastBlock = block + 1;
+    }
     const account = await alchemyProvider.send("eth_getProof", [
         '0x68787ab0ca5a4a8cc82177b4e4f206765ce39956', // amb address
         [item.raw_log_topics[2]], // topic 2
@@ -56,11 +50,26 @@ items.slice(items.length - 1).forEach(async item => {
             gasLimit: 500000
         }
     )
-    // console.log(gnosis_tx)
     console.log("WAITED")
     console.log(await gnosis_tx.wait())
     console.log("executeMessage done")
+}
 
-    // console.log(await provider.getTransactionReceipt(gnosis_tx.hash))
-})
+while (true) {
+    console.log("Checking for new transactions")
+    const covalentURL = "https://api.covalenthq.com/v1/5/events/address/" + goerli_amb_contract + "/?quote-currency=USD&format=JSON&starting-block=" + lastBlock + "&ending-block=latest&key=ckey_f6a51a0e21004ad29ebabc70660"
+    const resp = await axios.get(covalentURL, {
+        auth: {
+            username: "ckey_f6a51a0e21004ad29ebabc70660",
+            password: ""
+        }
+    })
 
+    const items = resp.data.data.items
+
+    for (let i = 0; i < items.length; i++) {
+        await emit(items[i])
+    }
+
+    await new Promise(r => setTimeout(r, 1000));
+}

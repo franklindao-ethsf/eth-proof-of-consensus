@@ -9,7 +9,7 @@ import "./Tokens.sol";
 
 contract Bridge is Ownable {
 	mapping(address => address) public tokenAddressConverter;
-	
+
 
 	function setMapping(address addr1, address addr2) public onlyOwner {
 		tokenAddressConverter[addr1] = addr2;
