@@ -8,10 +8,10 @@ const goerliProvider = new ethers.providers.JsonRpcProvider(
 console.log(process.env.GOERLI_PRIVATE_KEY);
 
 const goerliWallet = new ethers.Wallet(process.env.GOERLI_PRIVATE_KEY, goerliProvider);
-const deposit_addr = "0xbcbD47Cd8a2eF081E5363f7492388cef25d96FD0";
+const deposit_addr = "0x8b83625E935C9313bfc71D82f6151508b31828Eb";
 const caller_pubkey = process.env.GOERLI_PUBLIC_KEY;
-const gsb_addr = "0x21479ca050d11e9a66662220aD7fF67Ae92cc8a3";
-const gnosis_addr = "0xAa078eCB16aF1460c1224F2001967AFf3CaC97a5";
+const gsb_addr = "0x758C2a71db93eE90C5c1e3B800780763fe2F1D2C";
+const gnosis_addr = "0xE73403FC4a4cFeeAF0D64dEb2700958525764d18";
 const withdraw_addr = "0x557930A24690fc94afEDF6C5C94D750C232caeCB";
 
 console.log(goerliWallet.address);
@@ -52,18 +52,18 @@ async function main() {
     // console.log(mint_tx);
     // const mint_receipt = await mint_tx.wait();
     // console.log(mint_receipt);
-    // //
-    const add_token_deposit_tx = await deposit_contract.addToken(1, 5, [5, 100], [gsb_addr, gnosis_addr], {gasLimit: 1000000});
-    console.log("add_token_deposit_tx")
-    console.log(add_token_deposit_tx);
-    const add_token_deposit_receipt = await add_token_deposit_tx.wait();
-    console.log(add_token_deposit_receipt);
-
-    const add_token_withdraw_tx = await withdraw_contract.addToken(1, 5, [5, 100], [gsb_addr, gnosis_addr], {gasLimit: 1000000});
-    console.log("add_token_withdraw_tx")
-    console.log(add_token_withdraw_tx);
-    const add_token_withdraw_receipt = await add_token_withdraw_tx.wait();
-    console.log(add_token_withdraw_receipt);
+    // // //
+    // const add_token_deposit_tx = await deposit_contract.addToken(1, 5, [5, 100], [gsb_addr, gnosis_addr], {gasLimit: 1000000});
+    // console.log("add_token_deposit_tx")
+    // console.log(add_token_deposit_tx);
+    // const add_token_deposit_receipt = await add_token_deposit_tx.wait();
+    // console.log(add_token_deposit_receipt);
+    //
+    // const add_token_withdraw_tx = await withdraw_contract.addToken(1, 5, [5, 100], [gsb_addr, gnosis_addr], {gasLimit: 1000000});
+    // console.log("add_token_withdraw_tx")
+    // console.log(add_token_withdraw_tx);
+    // const add_token_withdraw_receipt = await add_token_withdraw_tx.wait();
+    // console.log(add_token_withdraw_receipt);
 
     const faucet_tx = await faucet_contract.mint(
         caller_pubkey,
@@ -94,8 +94,7 @@ async function main() {
         100,
         // inputs
         {
-            value: 0,
-            gasLimit: 200000,
+            gasLimit: 500000,
         }
     )
     console.log("deposit_tx")

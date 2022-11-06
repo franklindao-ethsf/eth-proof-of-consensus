@@ -1118,8 +1118,8 @@
       }
     },
     "src/amb/TrustlessAMB.sol": {
-      "lastModificationDate": 1667701909735,
-      "contentHash": "54d4cbed4bf615b19c0eb9191bc4eaaa",
+      "lastModificationDate": 1667721738400,
+      "contentHash": "f13805ba16c14b4ba68a1ad8f020bcda",
       "sourceName": "src/amb/TrustlessAMB.sol",
       "solcConfig": {
         "settings": {
@@ -1560,8 +1560,8 @@
       }
     },
     "src/bridge/PairwiseBridge.sol": {
-      "lastModificationDate": 1667694582501,
-      "contentHash": "70cd276b01c8aadeed3db3873bca0fda",
+      "lastModificationDate": 1667727154902,
+      "contentHash": "6e9e56798b9d8a11a18ef35deba1c202",
       "sourceName": "src/bridge/PairwiseBridge.sol",
       "solcConfig": {
         "settings": {

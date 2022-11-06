@@ -11,7 +11,7 @@ console.log(process.env.GNOSIS_PRIVATE_KEY);
 
 const wallet = new ethers.Wallet(process.env.GNOSIS_PRIVATE_KEY, provider);
 
-const gnosis_amb_addr = "0x4812651E7f7E1A18225e5EC003f9E032318B7adF"
+const gnosis_amb_addr = "0x15DD3Beca668a8FD55507280B5C842664d274125"
 console.log("Gnosis AMB: ", gnosis_amb_addr);
 
 const gnosis_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
@@ -22,7 +22,7 @@ const apiKey = "-pZDSyH8gXs_PdlVenq0wJz_m7YaZfTp";
 
 const alchemyProvider = new ethers.providers.AlchemyProvider("goerli", apiKey);
 
-const goerli_amb_contract = "0xb45096DB3B299fBcd37AD6F3B47AC3F3a8a1feD8"
+const goerli_amb_contract = "0x50f6DB30d3260885a54490cB30d5B202476E767D"
 
 let lastBlock = 7901325;
 

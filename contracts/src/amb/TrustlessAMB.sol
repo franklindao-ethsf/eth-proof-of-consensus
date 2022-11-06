@@ -85,5 +85,4 @@ contract AMB is TrustlessAMBStorage {
             emit ExecutedMessage(vars.nonce, messageRoot, message, status);
         }
     }
-
 }
