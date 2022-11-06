@@ -51,10 +51,6 @@ contract Deposit is PairwiseBridge {
         address destinationToken
 	);
 
-    event TestEvent(
-        uint8 num
-    );
-
 	constructor(ITrustlessAMB _homeAmb, uint16 _chainId) {
         homeAmb = _homeAmb;
 		chainId = _chainId;
@@ -73,21 +69,11 @@ contract Deposit is PairwiseBridge {
 		require(IERC20(tokenAddress).balanceOf(msg.sender) >= amount, "Insufficient balance");
         require(tokenRegistry[tokenId].sourceChainId != 0, "Invalid sourceChainId");
 
-        // if mapping exists => native => lock
-        if (tokenRegistry[tokenId].sourceChainId != chainId) {
-            IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);
-        } else {
-            // if non native token => burn
-            IERC20(tokenAddress).transferFrom(msg.sender, address(0), amount);
-        }
-
-        emit TestEvent(tokenId);
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);
 
         require(tokenRegistry[tokenId].tokenAddresses[destinationChainId] != address(0), "Invalid destination token address");
         address destinationToken = tokenRegistry[tokenId].tokenAddresses[destinationChainId];
-
-
-        bytes memory msgData = abi.encode(tokenId, recipient, amount, tokenAddress, destinationChainId, destinationToken);
+        bytes memory msgData = abi.encode(recipient, amount, destinationToken);
         homeAmb.send(foreignAddresses[destinationChainId], destinationChainId, GAS_LIMIT, msgData);
 		emit DepositEvent(tokenId, msg.sender, recipient, amount, tokenAddress, destinationChainId, destinationToken);
 	}
@@ -126,7 +112,6 @@ contract Withdraw is PairwiseBridge {
 		address indexed from,
 		address indexed recipient,
 		uint256 amount,
-		address tokenAddress,
 		address newTokenAddress
 	);
 
@@ -145,18 +130,12 @@ contract Withdraw is PairwiseBridge {
 	) public {
         require(msg.sender == foreignAmb, "Only foreign amb can call this function");
 
-        (uint8 tokenId, address recipient, uint256 amount, address tokenAddress, uint16 destinationChainId, address destinationToken) = abi.decode(callData, (uint8, address, uint256, address, uint16, address));
+        (address recipient, uint256 amount, address tokenAddress) = abi.decode(callData, (address, uint256, address));
 
-        address newTokenAddress = tokenAddressConverter[tokenAddress];
-        require(newTokenAddress != address(0), "Invalid token address");
+        require(tokenAddress != address(0), "Invalid token address");
 
-        if (destinationChainId == tokenRegistry[tokenId].sourceChainId) {
-            // unlock or transfer out of the deposit contract on this chain
-            IERC20(destinationToken).transferFrom(sameChainDeposit, recipient, amount);
-        } else {
-            // mint new
-            IERC20(destinationToken).transfer(recipient, amount);
-        }
-		emit WithdrawEvent(msg.sender, recipient, amount, tokenAddress, newTokenAddress);
+        IERC20(tokenAddress).transfer(recipient, amount);
+
+		emit WithdrawEvent(msg.sender, recipient, amount, tokenAddress);
 	}
 }

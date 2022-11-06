@@ -1560,8 +1560,8 @@
       }
     },
     "src/bridge/PairwiseBridge.sol": {
-      "lastModificationDate": 1667727154902,
-      "contentHash": "6e9e56798b9d8a11a18ef35deba1c202",
+      "lastModificationDate": 1667734446902,
+      "contentHash": "c668aa857ab146c875916a4bc7281f8a",
       "sourceName": "src/bridge/PairwiseBridge.sol",
       "solcConfig": {
         "settings": {

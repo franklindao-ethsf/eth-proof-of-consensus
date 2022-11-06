@@ -73,17 +73,17 @@ echo "Deploying Deposit contracts"
 forge create src/bridge/PairwiseBridge.sol:Deposit \
   --rpc-url $GOERLI_RPC_URL \
   --private-key $GOERLI_PRIVATE_KEY \
-  --constructor-args "$AMB_GOERLI_ADDRESS" "$GOERLI_CHAIN_ID"
+  --constructor-args "$AMB_GOERLI_ADDRESS" 5
 
 forge create src/bridge/PairwiseBridge.sol:Deposit \
   --rpc-url $GNOSIS_RPC_URL \
   --private-key $GNOSIS_PRIVATE_KEY \
-  --constructor-args "$AMB_GNOSIS_ADDRESS" "$GNOSIS_CHAIN_ID"
+  --constructor-args "$AMB_GNOSIS_ADDRESS" 100
 
 forge create src/bridge/PairwiseBridge.sol:Deposit \
   --rpc-url $POLYGON_RPC_URL \
   --private-key $POLYGON_PRIVATE_KEY \
-  --constructor-args "$AMB_POLYGON_ADDRESS" "$POLYGON_CHAIN_ID"
+  --constructor-args "$AMB_POLYGON_ADDRESS" 420
 
 echo "Deploying Withdraw contracts"
 forge create src/bridge/PairwiseBridge.sol:Withdraw \
