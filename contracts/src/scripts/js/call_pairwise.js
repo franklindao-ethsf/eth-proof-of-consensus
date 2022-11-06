@@ -8,10 +8,10 @@ const goerliProvider = new ethers.providers.JsonRpcProvider(
 console.log(process.env.GOERLI_PRIVATE_KEY);
 
 const goerliWallet = new ethers.Wallet(process.env.GOERLI_PRIVATE_KEY, goerliProvider);
-const deposit_addr = "0xb0513649D57365128a09Ee43b8c0D76DCF619bB3";
+const deposit_addr = "0xB9B112e2c591DeaDe330f1c2C28eC7EfaC84f1A7";
 const caller_pubkey = process.env.GOERLI_PUBLIC_KEY;
-const gsb_addr = "0xFA8A1FF3386f4205838765161541c31F9bdd1E23";
-const gnosis_addr = "0x7CC817f36E68337d28cDF67630a11c65807b598D";
+const gsb_addr = "0x80ed42C3601CD1E05c062cF0c6Edc037D1658C92";
+const gnosis_addr = "0x22932A69b4e078963c44c3B6f31A7677C72ED0dE";
 const withdraw_addr = "0xA7c4EE85071949A00B4f65FdEDca41f79ba0DDc9";
 
 console.log(goerliWallet.address);
@@ -86,21 +86,21 @@ async function main() {
     const approve_receipt = await approve_tx.wait();
     console.log(approve_receipt);
 
-    // const tx = await deposit_contract.deposit(
-    //     1,
-    //     caller_pubkey,
-    //     1,
-    //     gsb_addr,
-    //     100,
-    //     // inputs
-    //     {
-    //         gasLimit: 1000000,
-    //     }
-    // )
-    // console.log("deposit_tx")
-    // console.log(tx);
-    // const receipt = await tx.wait();
-    // console.log(receipt);
+    const tx = await deposit_contract.deposit(
+        1,
+        caller_pubkey,
+        1,
+        gsb_addr,
+        100,
+        // inputs
+        {
+            gasLimit: 1000000,
+        }
+    )
+    console.log("deposit_tx")
+    console.log(tx);
+    const receipt = await tx.wait();
+    console.log(receipt);
 
     const tx2 = await deposit_contract.deposit(
         1,

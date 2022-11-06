@@ -117,8 +117,8 @@ contract Withdraw is PairwiseBridge {
 
 	constructor(address _foreignAmb, address _sameChainDeposit) {
 		foreignAmb = _foreignAmb;
-        sameChainDeposit = _sameChainDeposit;
-        token = new SuccinctToken();
+        sameChainDeposit = _sameChainDeposit;[
+        token = new SuccinctToken();]
         uint256 MAX_INT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
         // Mint the max number of tokens to this contract
         token.mint(address(this), MAX_INT);

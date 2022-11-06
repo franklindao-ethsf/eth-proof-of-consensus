@@ -8,7 +8,7 @@ const gnosisprovider = new ethers.providers.JsonRpcProvider(
     process.env.GNOSIS_RPC_URL,
 );
 const gnosisWallet = new ethers.Wallet(process.env.GNOSIS_PRIVATE_KEY, gnosisprovider);
-const gnosis_amb_addr = "0x4A55AB2AC6367A28ff22dC87376673B5d4F23B91"
+const gnosis_amb_addr = "0x22932A69b4e078963c44c3B6f31A7677C72ED0dE"
 const gnosis_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
 const gnosis_amb_contract = new ethers.Contract(gnosis_amb_addr, gnosis_amb_contractABI, gnosisWallet);
 gnosis_amb_contract.connect(gnosisWallet);
@@ -21,7 +21,7 @@ const goerliprovider = new ethers.providers.JsonRpcProvider(
     process.env.GOERLI_RPC_URL,
 );
 const goerliWallet = new ethers.Wallet(process.env.GOERLI_PRIVATE_KEY, goerliprovider);
-const goerli_amb_addr = "0x0483eFdC8BDf3582Ba6f9A805d777ac2f7Cb8d42"
+const goerli_amb_addr = "0xc933074D2138fa47F3363B719528D76da64f9b26"
 const goerli_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
 const goerli_amb_contract = new ethers.Contract(goerli_amb_addr, goerli_amb_contractABI, goerliWallet);
 goerli_amb_contract.connect(goerliWallet);
@@ -30,12 +30,12 @@ const optimismprovider = new ethers.providers.JsonRpcProvider(
     process.env.OPTIMISM_RPC_URL,
 );
 const optimismWallet = new ethers.Wallet(process.env.OPTIMISM_PRIVATE_KEY, optimismprovider);
-const optimism_amb_addr = "0x0483eFdC8BDf3582Ba6f9A805d777ac2f7Cb8d42"
+const optimism_amb_addr = "0xcd0F8c5F1f64185f63faBA859C67eC9D08A867b4"
 const optimism_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
 const optimism_amb_contract = new ethers.Contract(optimism_amb_addr, optimism_amb_contractABI, optimismWallet);
 optimism_amb_contract.connect(optimismWallet);
 
-let lastBlock = 7901325;
+let lastBlock = 7902850;
 
 const emit = async item => {
     console.log("Processing transaction " + item.tx_hash)
@@ -49,7 +49,7 @@ const emit = async item => {
         lastBlock = block + 1;
     }
     const account = await alchemyProvider.send("eth_getProof", [
-        '0x68787ab0ca5a4a8cc82177b4e4f206765ce39956', // amb address
+        '0x8d78aB5e7e9629C0b6f4F97f309b60CD143EF8F9', // amb address
         [item.raw_log_topics[2]], // topic 2
         "0x" + block.toString(16)]
     );
@@ -83,7 +83,8 @@ const emit = async item => {
 
 while (true) {
     console.log("Checking for new transactions")
-    const covalentURL = "https://api.covalenthq.com/v1/5/events/address/" + goerli_amb_contract + "/?quote-currency=USD&format=JSON&starting-block=" + lastBlock + "&ending-block=latest&key=ckey_f6a51a0e21004ad29ebabc70660"
+    const covalentURL = "https://api.covalenthq.com/v1/5/events/address/" + goerli_amb_addr + "/?quote-currency=USD&format=JSON&starting-block=" + lastBlock + "&ending-block=latest&key=ckey_f6a51a0e21004ad29ebabc70660"
+    console.log(covalentURL)
     const resp = await axios.get(covalentURL, {
         auth: {
             username: "ckey_f6a51a0e21004ad29ebabc70660",

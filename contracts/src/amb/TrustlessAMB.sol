@@ -55,8 +55,8 @@ contract AMB is TrustlessAMBStorage {
         require(vars.chainId == chainId, "TrustlessAMB: wrong chainId");
 
         {
-            bytes32 executionStateRoot = lightClient.executionStateRoot(slot);
-            require(executionStateRoot != bytes32(0), "TrustlessAMB: execution state root not found");
+            // bytes32 executionStateRoot = lightClient.executionStateRoot(slot);
+            // require(executionStateRoot != bytes32(0), "TrustlessAMB: execution state root not found");
 
             // Verify the accountProof and get storageRoot
             // bytes32 storageRoot = HeaderProof.verifyAccount(accountProof, otherSideAMB, executionStateRoot);
