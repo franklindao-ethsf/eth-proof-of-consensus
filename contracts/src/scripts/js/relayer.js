@@ -27,9 +27,9 @@ const goerli_amb_contract = new ethers.Contract(goerli_amb_addr, goerli_amb_cont
 goerli_amb_contract.connect(goerliWallet);
 
 const optimismprovider = new ethers.providers.JsonRpcProvider(
-    process.env.POLYGON_RPC_URL,
+    process.env.OPTIMISM_RPC_URL,
 );
-const optimismWallet = new ethers.Wallet(process.env.POLYGON_PRIVATE_KEY, optimismprovider);
+const optimismWallet = new ethers.Wallet(process.env.OPTIMISM_PRIVATE_KEY, optimismprovider);
 const optimism_amb_addr = "0x0483eFdC8BDf3582Ba6f9A805d777ac2f7Cb8d42"
 const optimism_amb_contractABI = ["function executeMessage(uint64 slot, bytes calldata message, bytes[] calldata accountProof, bytes[] calldata storageProof)"]
 const optimism_amb_contract = new ethers.Contract(optimism_amb_addr, optimism_amb_contractABI, optimismWallet);

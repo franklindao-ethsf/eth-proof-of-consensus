@@ -86,21 +86,21 @@ async function main() {
     const approve_receipt = await approve_tx.wait();
     console.log(approve_receipt);
 
-    const tx = await deposit_contract.deposit(
-        1,
-        caller_pubkey,
-        1,
-        gsb_addr,
-        100,
-        // inputs
-        {
-            gasLimit: 1000000,
-        }
-    )
-    console.log("deposit_tx")
-    console.log(tx);
-    const receipt = await tx.wait();
-    console.log(receipt);
+    // const tx = await deposit_contract.deposit(
+    //     1,
+    //     caller_pubkey,
+    //     1,
+    //     gsb_addr,
+    //     100,
+    //     // inputs
+    //     {
+    //         gasLimit: 1000000,
+    //     }
+    // )
+    // console.log("deposit_tx")
+    // console.log(tx);
+    // const receipt = await tx.wait();
+    // console.log(receipt);
 
     const tx2 = await deposit_contract.deposit(
         1,
